@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VerumLux — A helper for the work that follows you home</title>
+<meta name="description" content="Plain-English AI help for military-community businesses. An AI helper that takes the repeat work, waits for your yes, and returns hours to your week.">
+<meta name="robots" content="noindex, nofollow">
+<!-- Draft only. No trackers, no external scripts, no forms that submit. -->
+<style>
+@font-face {
+  font-family: "Cormorant Garamond";
+  src: url("fonts/CormorantGaramond.ttf") format("truetype");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel";
+  src: url("fonts/Cinzel.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Sans 3";
+  src: url("fonts/SourceSans3.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --navy: #12233C;
+  --navy-deep: #0B1728;
+  --teal: #0F6E6A;
+  --royal: #1F4E8A;
+  --gold: #C4A35A;
+  --gold-bright: #E0C06A;
+  --gold-deep: #A9842E;
+  --cream: #F6F1E6;
+  --page: #F7F4EE;
+  --ink: #1A1A16;
+  --muted: #4A453C;
+  --white: #FFFcf6;
+  --tile-1: #1F4E8A;
+  --tile-2: #0F7A72;
+  --tile-3: #C8962A;
+  --tile-4: #C24E1F;
+  --tile-5: #3D6B2F;
+  --tile-6: #7A2E48;
+  --step-1: #DCEEEC;
+  --step-2: #D9E4F4;
+  --step-3: #F3E7C8;
+  --step-4: #F0DDD0;
+  --num-1: #0F6E6A;
+  --num-2: #1F4E8A;
+  --num-3: #B8860B;
+  --num-4: #C24E1F;
+  --max: 68rem;
+  --nav-h: 4.25rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { max-width: 100%; display: block; }
+a { color: inherit; }
+h1, h2, h3 { margin: 0; line-height: 1.15; color: var(--navy); }
+p { margin: 0; }
+.skip {
+  position: absolute;
+  left: -999px;
+  top: 0;
+}
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  background: var(--gold);
+  color: var(--navy-deep);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+}
+
+/* Nav */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(247, 244, 238, 0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(201, 163, 90, 0.35);
+}
+.nav-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0.7rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+nav { margin-left: auto; }
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+.wordmark .mark { width: 1.55rem; height: 1.55rem; flex: 0 0 auto; }
+.wordmark .brand {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.2em;
+  color: var(--navy);
+  text-transform: uppercase;
+}
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.nav-links a:hover, .nav-links a:focus-visible { color: var(--teal); }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
+  line-height: 1.2;
+  background: var(--gold);
+  color: var(--navy-deep);
+  border: 2px solid var(--gold);
+}
+.btn:hover, .btn:focus-visible { background: var(--gold-bright); }
+.btn-lg { padding: 0.85rem 1.45rem; font-size: 1.05rem; }
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border-color: rgba(224, 192, 106, 0.7);
+}
+.btn-ghost:hover, .btn-ghost:focus-visible {
+  background: rgba(224, 192, 106, 0.15);
+  color: #fff;
+}
+.nav-cta, .nav .btn { padding: 0.5rem 1rem; font-size: 0.92rem; flex: 0 0 auto; }
+
+/* Hero */
+.hero {
+  background: linear-gradient(118deg, #0C1A32 0%, #163A62 48%, #0C5C68 100%);
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+  padding: 3.4rem 1.4rem 3.6rem;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 6px;
+  background: var(--gold);
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  right: -6rem;
+  top: -4rem;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(224, 192, 106, 0.28) 0%, rgba(12, 92, 104, 0) 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.kicker {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+}
+.hero h1 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  font-size: clamp(2.4rem, 5.4vw, 4.15rem);
+  color: #FFF8EC;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+.hero .deck {
+  margin-top: 1.15rem;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: #F0E6D2;
+  max-width: 40rem;
+}
+.audience {
+  margin-top: 1rem;
+  color: #E8DFD0;
+  font-size: 1.05rem;
+  max-width: 40rem;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.8rem;
+}
+
+/* Shared layout */
+.wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 4rem 1.4rem;
+}
+section { scroll-margin-top: calc(var(--nav-h) + 0.6rem); }
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.7rem;
+}
+.pip {
+  width: 0.42rem;
+  height: 1.05rem;
+  background: var(--gold);
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+.section-label h2, .promise h2, .cta-panel h2 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3vw, 2.25rem);
+}
+.lede {
+  color: var(--muted);
+  max-width: 42rem;
+  margin: 0 0 1.8rem;
+  font-size: 1.15rem;
+}
+
+/* Outcomes */
+.outcomes { background: var(--page); }
+.grid-3, .grid-2 {
+  display: grid;
+  gap: 1rem;
+}
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 1.2rem 1.2rem 1.25rem;
+  box-shadow: 0 1px 0 rgba(18, 35, 60, 0.06);
+}
+.card h3 {
+  font-family: "Source Sans 3", sans-serif;
+  font-weight: 700;
+  font-size: 1.12rem;
+  margin-bottom: 0.35rem;
+}
+.card p { color: var(--muted); font-size: 1.02rem; }
+.outcome .n {
+  font-family: "Cinzel", serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  color: var(--gold-deep);
+  margin-bottom: 0.35rem;
+}
+
+/* Steps */
+.how { background: #fff; }
+.steps {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 0;
+  align-items: stretch;
+}
+.step {
+  border-radius: 14px;
+  padding: 1.15rem 1.05rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.step-1 { background: var(--step-1); }
+.step-2 { background: var(--step-2); }
+.step-3 { background: var(--step-3); }
+.step-4 { background: var(--step-4); }
+.num {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #fff;
+  margin-bottom: 0.7rem;
+}
+.step-1 .num { background: var(--num-1); }
+.step-2 .num { background: var(--num-2); }
+.step-3 .num { background: var(--num-3); }
+.step-4 .num { background: var(--num-4); }
+.step h3 {
+  font-size: 1.12rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+.step p { color: var(--muted); font-size: 1.02rem; }
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-deep);
+  padding: 0 0.25rem;
+  width: 1.4rem;
+}
+.chevron svg { width: 0.7rem; height: 1.1rem; }
+.chevron.down { display: none; }
+
+/* Jobs */
+.jobs-sec { background: var(--page); }
+.job { display: flex; flex-direction: column; gap: 0.55rem; }
+.icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.job-1 .icon { background: var(--tile-1); }
+.job-2 .icon { background: var(--tile-2); }
+.job-3 .icon { background: var(--tile-3); }
+.job-3 .icon svg { stroke: #1A1A16; }
+.job-4 .icon { background: var(--tile-4); }
+.job-5 .icon { background: var(--tile-5); }
+.job-6 .icon { background: var(--tile-6); }
+
+/* Path */
+.path-sec { background: #fff; }
+.path {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: stretch;
+  margin-bottom: 1.3rem;
+}
+.path-step {
+  background: var(--white);
+  border: 1px solid rgba(18, 35, 60, 0.08);
+  border-radius: 14px;
+  padding: 1.15rem 1.05rem;
+  min-width: 0;
+}
+.path-step .n {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--gold-bright);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.65rem;
+}
+.path-step h3 { font-size: 1.08rem; font-weight: 700; margin-bottom: 0.4rem; }
+.path-step p { color: var(--muted); font-size: 1.02rem; }
+.quote-note {
+  display: inline-block;
+  background: #F8EFC8;
+  border: 2px dashed var(--gold-deep);
+  border-radius: 14px;
+  padding: 0.85rem 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* Independent */
+.indep { background: var(--page); }
+.indep-card {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+.indep-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.indep-icon svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: var(--gold-bright);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Example */
+.example-sec { background: #fff; }
+.example {
+  background: var(--white);
+  border: 1px solid rgba(18, 35, 60, 0.08);
+  border-left: 6px solid var(--gold);
+  border-radius: 14px;
+  padding: 1.5rem 1.5rem 1.6rem;
+}
+.badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: #F8EFC8;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  margin-bottom: 0.8rem;
+}
+.example h3 {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  font-size: 1.7rem;
+  margin-bottom: 0.7rem;
+}
+.example p + p { margin-top: 0.8rem; }
+.example p { color: var(--muted); }
+.example strong { color: var(--navy); font-weight: 700; }
+
+/* Promise */
+.promise-sec { padding: 0 1.4rem 3.2rem; background: #fff; }
+.promise {
+  max-width: var(--max);
+  margin: 0 auto 0;
+  background: var(--navy-deep);
+  color: var(--cream);
+  border-radius: 16px;
+  padding: 1.6rem 1.6rem;
+  display: grid;
+  grid-template-columns: 3.1rem 1fr;
+  gap: 1.1rem;
+  align-items: center;
+}
+.promise h2 { color: var(--gold-bright); margin-bottom: 0.4rem; }
+.promise p { color: #F0E6D2; font-size: 1.12rem; }
+.shield { width: 3.1rem; height: 3.1rem; }
+.shield svg { width: 3.1rem; height: 3.1rem; }
+
+/* CTA / contact */
+.contact-sec { background: var(--page); }
+.cta-panel {
+  background: #F8EFC8;
+  border: 2.5px dashed var(--gold-deep);
+  border-radius: 16px;
+  padding: 1.8rem 1.5rem;
+  text-align: center;
+}
+.cta-panel h2 { margin-bottom: 0.6rem; }
+.cta-panel .lede { margin: 0 auto 1.3rem; text-align: center; color: var(--muted); }
+.coming-soon {
+  margin-top: 2rem;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 1.4rem 1.4rem 1.5rem;
+}
+.coming-soon h3 {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+}
+.coming-soon .note {
+  color: var(--muted);
+  margin-bottom: 1.1rem;
+}
+.fields { display: grid; gap: 0.9rem; }
+.field-row {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0.8rem;
+  align-items: end;
+}
+.field-row .lbl { color: var(--muted); font-weight: 600; padding-bottom: 0.15rem; }
+.contact-link { color: var(--navy); font-weight: 700; font-size: 1.05rem; text-decoration: underline; text-decoration-color: var(--gold-deep); text-underline-offset: 3px; word-break: break-all; }
+.field-row .line { border-bottom: 1.5px solid var(--navy); height: 1.5rem; }
+
+/* Footer */
+footer.site {
+  background: var(--navy-deep);
+  color: #E8DFD0;
+  padding: 1.4rem 1.4rem 1.6rem;
+}
+.foot-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.6rem 1.5rem;
+  align-items: baseline;
+}
+.foot-inner .tag { font-size: 0.95rem; }
+.foot-brand {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 960px) {
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .steps, .path {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .chevron { display: none; }
+  .chevron.down {
+    display: flex;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    transform: rotate(90deg);
+    justify-content: center;
+  }
+  .path .chevron, .path .chevron.down { display: none; }
+}
+@media (max-width: 700px) {
+  body { font-size: 1.05rem; }
+  .nav-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.45rem 0.8rem;
+    padding: 0.65rem 1.1rem;
+  }
+  .wordmark { grid-column: 1; grid-row: 1; }
+  .nav-cta { grid-column: 2; grid-row: 1; }
+  nav { grid-column: 1 / -1; grid-row: 2; margin-left: 0; }
+  .nav-links { width: 100%; justify-content: flex-start; gap: 0.55rem 1rem; }
+  .hero { padding: 2.4rem 1.1rem 2.6rem; }
+  .wrap { padding: 2.6rem 1.1rem; }
+  .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .field-row { grid-template-columns: 1fr; gap: 0.15rem; }
+  .promise {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    padding: 1.3rem 1.15rem;
+  }
+  .hero .deck, .audience { font-size: 1.05rem; }
+}
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="wordmark" href="#top">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="14.5" fill="none" stroke="#C4A35A" stroke-width="1.5"/>
+          <path d="M16 5.5 L17.6 14.4 L26.5 16 L17.6 17.6 L16 26.5 L14.4 17.6 L5.5 16 L14.4 14.4 Z" fill="#C4A35A"/>
+          <circle cx="16" cy="16" r="2.1" fill="#12233C"/>
+        </svg>
+        <span class="brand">VerumLux</span>
+      </a>
+      <nav aria-label="Page">
+        <ul class="nav-links">
+          <li><a href="#outcomes">Outcomes</a></li>
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#how-we-work">Working together</a></li>
+        </ul>
+      </nav>
+      <a class="btn nav-cta" href="#contact">A free 30-minute look</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-inner">
+        <p class="kicker">VerumLux</p>
+        <h1>A helper for the work that follows you home</h1>
+        <p class="deck">An AI helper for shops that serve military families. It takes the repeat work, waits for your yes before anything goes out in your name, and returns hours to your week.</p>
+        <p class="audience">Made for Exchange concession vendors, military-spouse-owned businesses, and veteran-owned businesses — and for other small shops that serve the same community.</p>
+        <div class="hero-actions">
+          <a class="btn btn-lg" href="#contact">A free 30-minute look</a>
+          <a class="btn btn-lg btn-ghost" href="#how-it-works">See how it works</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="outcomes" id="outcomes">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>Owners buy outcomes</h2>
+        </div>
+        <p class="lede">You are not buying a tool for its own sake. You are buying a result you can feel in a particular week — named in your words, with a number attached when we can find one.</p>
+        <div class="grid-3">
+          <article class="card outcome">
+            <div class="n">01</div>
+            <h3>Hours back</h3>
+            <p>The repeat work is prepared for you, so more of the week is yours again.</p>
+          </article>
+          <article class="card outcome">
+            <div class="n">02</div>
+            <h3>Calls and leads that stop slipping</h3>
+            <p>Every message gets a draft waiting, and nothing sits in a forgotten pile.</p>
+          </article>
+          <article class="card outcome">
+            <div class="n">03</div>
+            <h3>Faster cash</h3>
+            <p>Polite invoice reminders are ready to go — after you approve each one.</p>
+          </article>
+          <article class="card outcome">
+            <div class="n">04</div>
+            <h3>Fewer errors</h3>
+            <p>The helper checks the work against your own prices or due list before anything is sent.</p>
+          </article>
+          <article class="card outcome">
+            <div class="n">05</div>
+            <h3>Better reputation</h3>
+            <p>A thoughtful reply is waiting for every review, held until you say it may go public.</p>
+          </article>
+          <article class="card outcome">
+            <div class="n">06</div>
+            <h3>Peace of mind</h3>
+            <p>One short page that tells you what needs you today, and nothing else.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how-it-works">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>How it works, in four steps</h2>
+        </div>
+        <p class="lede">You describe the job the way you would brief a new hire. The helper prepares the work. You keep every yes.</p>
+        <div class="steps">
+          <article class="step step-1">
+            <div class="num">1</div>
+            <h3>You name the job</h3>
+            <p>Say it as you would to a new hire: “Text customers the day before they pick up.”</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="step step-2">
+            <div class="num">2</div>
+            <h3>It prepares the work</h3>
+            <p>It uses only the tools you choose to share — email, calendar, or books.</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="step step-3">
+            <div class="num">3</div>
+            <h3>You give the yes</h3>
+            <p>You decide what needs approval. A message, invoice, or public reply waits until you say so.</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="step step-4">
+            <div class="num">4</div>
+            <h3>You get hours back</h3>
+            <p>A short list is waiting on your phone, and the evening can end on time.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="jobs-sec" id="what-it-can-do">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>What it can do for your shop</h2>
+        </div>
+        <p class="lede">These are everyday jobs in a small shop. The helper drafts them. You stay the person who sends them.</p>
+        <div class="grid-3">
+          <article class="card job job-1">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg></div>
+            <h3>Answer everyday questions</h3>
+            <p>Drafts replies on hours, prices, and how to find you — you approve them.</p>
+          </article>
+          <article class="card job job-2">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M8 3.5v3M16 3.5v3M4 9.5h16"/></svg></div>
+            <h3>Remind people before they come in</h3>
+            <p>Pickup and appointment reminders, so no one drives over for an order that isn’t ready.</p>
+          </article>
+          <article class="card job job-3">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-1.6 5 8.2 8.2 0 0 1-12.2.9L3.5 19l1.6-3.6A8.3 8.3 0 1 1 21 11.5z"/></svg></div>
+            <h3>Follow up on quotes and custom work</h3>
+            <p>A kind note to anyone who asked about a bulk order or special item and hasn’t heard back.</p>
+          </article>
+          <article class="card job job-4">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="1.2"/><path d="M8.5 9h7M8.5 12.5h7M8.5 16h4.5"/></svg></div>
+            <h3>Nudge unpaid invoices</h3>
+            <p>Polite reminders for leftover balances and group orders — you approve each one.</p>
+          </article>
+          <article class="card job job-5">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V7.5M4 18h16"/><path d="M7 14v4M11.5 11v7M16 8.5v9.5"/></svg></div>
+            <h3>A Monday morning snapshot</h3>
+            <p>One page at the start of the week: what’s due, what sold, and what’s still unpaid.</p>
+          </article>
+          <article class="card job job-6">
+            <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.8l2.1 5.1 5.5.4-4.2 3.6 1.3 5.3L12 15.7 7.3 18.2l1.3-5.3-4.2-3.6 5.5-.4z"/></svg></div>
+            <h3>Reply to reviews</h3>
+            <p>A thoughtful draft for every new review, held until you say it may go public.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="path-sec" id="how-we-work">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>How we work together</h2>
+        </div>
+        <p class="lede">A clear path, named at each step. Fees are quoted after the free look — not before, and not as a menu on this page.</p>
+        <div class="path">
+          <article class="path-step">
+            <div class="n">1</div>
+            <h3>A free 30-minute look</h3>
+            <p>Name one task that eats your week. We’ll sit with it and see how a helper could take it on. Nothing is sent, and nothing is connected, unless you later say yes.</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="path-step">
+            <div class="n">2</div>
+            <h3>A paid assessment</h3>
+            <p>A process review of how the week actually runs, and a written plan for the first three jobs worth doing.</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="path-step">
+            <div class="n">3</div>
+            <h3>A fixed-price build</h3>
+            <p>The first helper, named and scoped, then piloted with you still approving every message.</p>
+          </article>
+          <div class="chevron" aria-hidden="true"><svg viewBox="0 0 12 20"><path d="M2 2l8 8-8 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <article class="path-step">
+            <div class="n">4</div>
+            <h3>A monthly care plan</h3>
+            <p>Monitoring, small changes, and a regular report, so the helper stays useful after launch.</p>
+          </article>
+        </div>
+        <p class="quote-note">Every fee is quoted after the free look.</p>
+      </div>
+    </section>
+
+    <section class="indep" id="why-independent">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>Why this stays yours</h2>
+        </div>
+        <p class="lede">The helper works for your shop, in accounts you own, under rules you set. You can pause it. You can walk away. Your data stays with you.</p>
+        <div class="grid-2">
+          <article class="card indep-card">
+            <div class="indep-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5l7 2.4v6.4c0 4.3-2.9 7.5-7 8.7-4.1-1.2-7-4.4-7-8.7V5.9z"/><path d="M9 12.2l2.2 2.2 4.2-4.4"/></svg></div>
+            <div>
+              <h3>You own your accounts and data</h3>
+              <p>Sign-ins stay in your name. The helper is a guest you can invite, limit, and revoke. Your lists, mail, and books remain yours.</p>
+            </div>
+          </article>
+          <article class="card indep-card">
+            <div class="indep-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="12" r="3"/><circle cx="16" cy="8" r="3"/><circle cx="16" cy="16" r="3"/><path d="M10.6 10.6l3-1.6M10.6 13.4l3 1.6"/></svg></div>
+            <div>
+              <h3>The tools you already use</h3>
+              <p>We start with the email, calendar, and books you already have — not a stack you have to adopt to get help.</p>
+            </div>
+          </article>
+          <article class="card indep-card">
+            <div class="indep-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="1.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+            <div>
+              <h3>Sensitive work can stay put</h3>
+              <p>When a job should not leave the building, it can run on a computer you own. Only a de-identified note needs to come back, if anything does.</p>
+            </div>
+          </article>
+          <article class="card indep-card">
+            <div class="indep-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 12h10M13 8l4 4-4 4"/><rect x="3.5" y="4.5" width="17" height="15" rx="2"/></svg></div>
+            <div>
+              <h3>No lock-in</h3>
+              <p>You can pause the helper or stop altogether. Your accounts, files, and customer relationships stay with you.</p>
+            </div>
+          </article>
+        </div>
+        <p class="lede" style="margin: 1.4rem 0 0;">And the rule that does not move: nothing goes out in your name without your approval.</p>
+      </div>
+    </section>
+
+    <section class="example-sec" id="example">
+      <div class="wrap">
+        <div class="section-label">
+          <span class="pip" aria-hidden="true"></span>
+          <h2>A practice example</h2>
+        </div>
+        <article class="example">
+          <div class="badge">Illustrative example — not a real shop, and not a measured result</div>
+          <h3>Lantern &amp; Twine</h3>
+          <p>Lantern &amp; Twine is a fictional gift-wrap and monogram kiosk, imagined inside an Exchange. In the sketch, the work that followed the owner home was pickup reminders and after-hours “is it ready?” texts. Wrapping and monogramming stayed in human hands.</p>
+          <p>The practice design was a helper that would draft those reminders for a short morning approval. On paper, that is about <strong>two hours a week back on pickup reminders</strong>. It is a teaching example of the method — not a client story, and not a promise of the same hours in another shop.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="promise-sec">
+      <aside class="promise" id="promise">
+        <div class="shield" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <path d="M24 4.5l16 5.4v14.2c0 9.8-6.6 16.8-16 19.4C14.6 40.9 8 33.9 8 24.1V9.9z" fill="#E0C06A"/>
+            <path d="M17.2 24.2l5.2 5.2 9.2-10" fill="none" stroke="#0B1728" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h2>You stay in charge</h2>
+          <p>Nothing goes out in your name without your approval. Your data stays yours. You choose what the helper can see, and you can pause it whenever you want.</p>
+        </div>
+      </aside>
+    </div>
+
+    <section class="contact-sec" id="contact">
+      <div class="wrap">
+        <div class="cta-panel">
+          <h2>A free 30-minute look</h2>
+          <p class="lede">Name one task that eats your week. We’ll show you how an AI helper could take it on — with you still in charge of every message.</p>
+        </div>
+        <div class="coming-soon">
+          <h3>Reach VerumLux</h3>
+          <p class="note">Send a note to ask for your free 30-minute look.</p>
+          <div class="fields">
+            <div class="field-row">
+              <div class="lbl">Email</div>
+              <div><a class="contact-link" href="mailto:verumlux@proton.me">verumlux@proton.me</a></div>
+            </div>
+            <div class="field-row">
+              <div class="lbl">X</div>
+              <div><a class="contact-link" href="https://x.com/VerumLux_ai" target="_blank" rel="noopener">@VerumLux_ai</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="foot-inner">
+      <div class="tag">Plain-English AI help for military-community businesses</div>
+      <div class="foot-brand">VerumLux</div>
+    </div>
+  </footer>
+</body>
+</html>
